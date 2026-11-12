@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T02:49:56.403467+00:00",
+  "title": "Design System: Aftermath",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Deep action green"
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Daylight page"
+      },
+      "rail": {
+        "role": "neutral",
+        "displayName": "Sage navigation"
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White work surface"
+      },
+      "fault": {
+        "role": "status",
+        "displayName": "Amber fault"
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "button-background",
+        "value": "background 0.15s ease",
+        "purpose": "Button background transition; disabled under prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide",
+        "value": "1500px",
+        "query": "(min-width: 1500px)"
+      },
+      {
+        "name": "compact",
+        "value": "1100px",
+        "query": "(max-width: 1100px)"
+      },
+      {
+        "name": "mobile",
+        "value": "800px",
+        "query": "(max-width: 800px)"
+      }
+    ],
+    "focus": {
+      "value": "2px solid #17694c",
+      "offset": "4px",
+      "appliesTo": [
+        "button",
+        "a",
+        "input",
+        "select"
+      ]
+    },
+    "surfaces": [
+      {
+        "name": "Failure lab",
+        "mode": "Operate",
+        "structure": [
+          "Workspace header",
+          "Introduction and simulated activity label",
+          "Experiment setup left; recovery workbench right",
+          "Recent experiments below",
+          "Footer"
+        ],
+        "mobile": "Top navigation; setup above recovery; recent experiments below.",
+        "recoveryWorkbench": [
+          "Run identity and export",
+          "Four-step pipeline",
+          "Credit evidence",
+          "Event timeline and advance/restart action"
+        ]
+      },
+      {
+        "name": "Transaction inspector",
+        "mode": "Operate",
+        "structure": [
+          "Workspace header",
+          "Introduction and read-only RPC label",
+          "Transaction lookup form",
+          "RPC result and raw JSON",
+          "Footer"
+        ],
+        "maxWidth": "900px"
+      }
+    ],
+    "verification": {
+      "method": "source inspection",
+      "sources": [
+        "frontend/src/style.css",
+        "frontend/src/main.tsx",
+        "PRODUCT.md"
+      ],
+      "browserVerified": false,
+      "limitation": "Browser verification blocked by sandbox EPERM."
+    }
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Full-width experiment creation action.",
+      "html": "<button class=\"ds-primary\">Create experiment <span aria-hidden=\"true\">\u2192</span></button>",
+      "css": ".ds-primary{font:12px \"DM Sans\",sans-serif;background:#235e43;color:#fff;padding:13px 15px;border:0;border-radius:5px;display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;cursor:pointer;transition:background .15s}.ds-primary:hover{background:#174a32}.ds-primary:focus-visible{outline:2px solid #17694c;outline-offset:4px}.ds-primary:disabled{opacity:.45;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+    },
+    {
+      "name": "Timeline action",
+      "kind": "button",
+      "refersTo": "",
+      "description": "Advance one attempt or restart a stopped worker.",
+      "html": "<button class=\"ds-step\">Advance worker</button>",
+      "css": ".ds-step{font:10px \"DM Sans\",sans-serif;border:1px solid #cbd8c6;background:#f5f8f0;border-radius:4px;padding:8px 10px;color:#31583c;cursor:pointer;transition:background .15s}.ds-step:focus-visible{outline:2px solid #17694c;outline-offset:4px}.ds-step:disabled{opacity:.45;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-step{transition:none}}"
+    },
+    {
+      "name": "Export action",
+      "kind": "button",
+      "refersTo": "",
+      "description": "Outlined icon-only run export.",
+      "html": "<button class=\"ds-export\" aria-label=\"Export run JSON\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3\"/></svg></button>",
+      "css": ".ds-export{background:none;border:1px solid #dce3d8;border-radius:5px;padding:8px;color:#5c715e;cursor:pointer;transition:background .15s}.ds-export:focus-visible{outline:2px solid #17694c;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-export{transition:none}}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Visible label and signature field for read-only lookup.",
+      "html": "<label class=\"ds-label\">Transaction signature<input class=\"ds-input\" placeholder=\"Paste a base58 transaction signature\" /></label>",
+      "css": ".ds-label{display:block;font:550 12px \"DM Sans\",sans-serif;color:#23352e}.ds-input{display:block;font:13px monospace;background:#fafbf8;border:1px solid #d6dfd3;border-radius:5px;color:#304438;padding:11px;width:100%;margin-top:9px;box-sizing:border-box}.ds-input:focus-visible{outline:2px solid #17694c;outline-offset:4px}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Icon-and-label navigation with selected surface.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-active\">Failure lab <span>01</span></button><button>Transaction inspector <span>\u203a</span></button></nav>",
+      "css": ".ds-nav{display:grid;gap:9px;background:#edf0e9;padding:14px}.ds-nav button{font:12px \"DM Sans\",sans-serif;display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:13px 10px;text-align:left;border-radius:6px;color:#516256;cursor:pointer;transition:background .15s}.ds-nav button.ds-active{background:#dce7da;color:#234f38;font-weight:650}.ds-nav span{margin-left:auto;font-size:10px}.ds-nav button:focus-visible{outline:2px solid #17694c;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-nav button{transition:none}}"
+    },
+    {
+      "name": "Simulation label",
+      "kind": "chip",
+      "refersTo": "",
+      "description": "Explicit synthetic activity marker.",
+      "html": "<span class=\"ds-simulation\"><i></i>SIMULATED ACTIVITY</span>",
+      "css": ".ds-simulation{display:inline-flex;gap:8px;align-items:center;font:650 9px \"DM Sans\",sans-serif;letter-spacing:.9px;color:#856236;background:#f1eadc;border:1px solid #e4d7be;border-radius:4px;padding:8px 10px;white-space:nowrap}.ds-simulation i{width:6px;height:6px;border-radius:50%;background:#ad8240}"
+    },
+    {
+      "name": "Workbench panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Flat bordered container for controls and recovery evidence.",
+      "html": "<section class=\"ds-panel\"><h2>Recovery workbench</h2><p>Follow every state change.</p></section>",
+      "css": ".ds-panel{border:1px solid #dce2d8;background:#fff;border-radius:9px;padding:23px;color:#23352e;font-family:\"DM Sans\",sans-serif}.ds-panel h2{font-size:17px;font-weight:650;margin:0}.ds-panel p{font-size:12px;color:#6c786e;margin:8px 0 0;line-height:1.6}"
+    },
+    {
+      "name": "Credit evidence",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Inset credit count and invariant evidence.",
+      "html": "<div class=\"ds-proof\"><div><strong>1 / 1 credits written</strong><p>Single-credit invariant holds. 4 of 4 notifications acknowledged.</p></div></div>",
+      "css": ".ds-proof{display:flex;gap:13px;background:#edf4e9;padding:19px 16px;align-items:center;border-radius:5px;font-family:\"DM Sans\",sans-serif;color:#3d7347}.ds-proof strong{font-size:16px;color:#315e39;font-weight:600}.ds-proof p{font-size:10px;margin:4px 0 0;color:#607759;line-height:1.6}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Daylight engineering workbench",
+    "overview": "Quiet green neutrals, flat white panels, and compact typography support precise inspection. The interface puts recovery evidence close to the experiment controls and uses restrained color to distinguish faults from successful credit.",
+    "keyCharacteristics": [
+      "Compact, task-focused controls and evidence.",
+      "Green correctness signals and amber fault signals.",
+      "Visible distinction between simulated activity and read-only chain inspection."
+    ],
+    "rules": [],
+    "dos": [
+      "Do retain visible simulation and read-only labels.",
+      "Do keep identifiers and logical ticks in monospace.",
+      "Do preserve keyboard focus outlines and reduced-motion behavior.",
+      "Do keep setup before recovery in mobile reading order."
+    ],
+    "donts": [
+      "Don't use shadows to add hierarchy to the existing flat surfaces.",
+      "Don't let the pipeline replace the event timeline as recovery evidence."
+    ]
+  }
+}
