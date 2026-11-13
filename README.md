@@ -1,6 +1,6 @@
 # Aftermath
 
-A Solana payment failure lab built for [ebilesh](https://github.com/ebilesh). Reproduce an acknowledgement gap, recover the worker, and inspect why an order receives one credit despite repeated delivery.
+A Solana payment failure lab. Reproduce an acknowledgement gap, recover the worker, and inspect why an order receives one credit despite repeated delivery.
 
 ## Run locally
 
@@ -95,4 +95,10 @@ What runs for real: Python subprocesses, database transactions, uniqueness const
 
 ### Verification in this build environment
 
-17 Python tests passed, including an actual subprocess kill/restart, HTTP request handling through the real subprocess worker, and mocked Solana RPC contracts and unavailable responses. TypeScript checking and the Vite production build passed. The standalone recipe runner passed. Browser verification and listening-server startup were attempted but blocked by sandbox socket permissions (EPERM); outbound npm DNS was unavailable. Dependencies were installed from the local cache, and a lockfile is included. Live Solana connectivity has not been verified here. RPC tests use explicit mocks, never fabricated live results.
+23 Python tests passed, including an actual subprocess kill/restart, HTTP request handling through the real subprocess worker, and mocked Solana RPC contracts and unavailable responses. TypeScript checking and the Vite production build passed. The standalone recipe runner passed. Browser verification and listening-server startup were attempted but blocked by sandbox socket permissions (EPERM); outbound npm DNS was unavailable. Dependencies were installed from the local cache, and a lockfile is included. Live Solana connectivity has not been verified here. RPC tests use explicit mocks, never fabricated live results.
+
+## Transaction evidence improvements
+
+The inspector validates that a base58 signature decodes to exactly 64 bytes. It summarizes parsed native SOL transfer and transfer-with-seed instructions from both outer instructions and inner CPI instructions, with source, destination, and exact lamport strings. Failed transactions and missing execution metadata never mark a transfer as applied. This summary is not a merchant payment validator and does not write to the credit ledger. Unsupported instructions remain available in the raw response.
+
+New regression tests use explicit fixtures for failed execution, missing metadata, inner transfers, unsupported programs, invalid signatures, and integer precision beyond JavaScript safe integers. Live RPC connectivity and browser interaction for these additions have not been verified here.

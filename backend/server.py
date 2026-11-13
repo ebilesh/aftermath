@@ -7,18 +7,20 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from .lab import Lab
+from .evidence import validate_signature, summarize
 
 lab = Lab(os.environ.get('AFTERMATH_DB','aftermath.sqlite3'))
 ROOT = Path(__file__).resolve().parents[1] / 'frontend' / 'dist'
 
 def inspect(signature, cluster):
-    if not re.fullmatch(r'[1-9A-HJ-NP-Za-km-z]{64,88}', signature): raise ValueError('Enter a base58 Solana transaction signature (64–88 characters).')
+    validate_signature(signature)
     if cluster not in ('devnet','mainnet-beta'): raise ValueError('Unknown cluster')
     payload = dict(jsonrpc='2.0',id=1,method='getTransaction',params=[signature,dict(encoding='jsonParsed',commitment='finalized',maxSupportedTransactionVersion=0)])
     req = urllib.request.Request(f'https://api.{cluster}.solana.com',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
     with urllib.request.urlopen(req,timeout=12) as response: data = json.load(response)
+    if not isinstance(data,dict) or 'result' not in data and 'error' not in data: raise ValueError('RPC returned no transaction result.')
     if 'error' in data: raise ValueError('Solana RPC rejected the request. Try again later or use another cluster.')
-    return dict(cluster=cluster,signature=signature,commitment='finalized',result=data.get('result'))
+    return dict(cluster=cluster,signature=signature,commitment='finalized',result=data.get('result'),evidence=summarize(data.get('result')))
 
 class Handler(BaseHTTPRequestHandler):
     def send_json(self,data,status=200):

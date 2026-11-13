@@ -537,11 +537,25 @@ function App() {
                         Slot {inspection.result.slot} · Fee{" "}
                         {inspection.result.meta?.fee ?? "unknown"} lamports ·{" "}
                         {inspection.result.meta
-                          ? inspection.result.meta.err
+                          ? !("err" in inspection.result.meta) ? "Execution metadata unavailable" : inspection.result.meta.err
                             ? "Execution failed"
                             : "Execution succeeded"
                           : "Execution metadata unavailable"}
                       </p>
+                      <h3>Native SOL transfer instructions</h3>
+                      <p>{inspection.evidence?.warning}</p>
+                      {inspection.evidence?.transfers.length ? (
+                        <div className="transfer-evidence">
+                          {inspection.evidence.transfers.map((transfer: {scope:string;instruction:number;source:string;destination:string;lamports:string;applied:boolean}) => (
+                            <article key={`${transfer.scope}:${transfer.instruction}`}>
+                              <strong>{transfer.lamports} lamports · {transfer.applied ? "Execution succeeded" : "Not confirmed as applied"}</strong>
+                              <p className="signature">From: {transfer.source}</p>
+                              <p className="signature">To: {transfer.destination}</p>
+                              <small>{transfer.scope} / instruction {transfer.instruction}</small>
+                            </article>
+                          ))}
+                        </div>
+                      ) : <p>No supported parsed native SOL transfer instructions returned.</p>}
                       <details open>
                         <summary>Raw RPC result</summary>
                         <pre>{JSON.stringify(inspection, null, 2)}</pre>

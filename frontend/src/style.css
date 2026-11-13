@@ -716,3 +716,4 @@ summary {
   font-family: monospace;
   font-size: 11px;
 }
+.transfer-evidence article { margin: 16px 0; padding: 16px; background: #f3f5ef; border-radius: 5px; }
