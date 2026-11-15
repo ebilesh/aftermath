@@ -22,20 +22,20 @@ colors:
   muted: "#6c786e"
 typography:
   headline:
-    fontFamily: '"DM Sans", sans-serif'
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' 
     fontSize: "36px"
-    fontWeight: 550
+    fontWeight: 750
     letterSpacing: "-1.2px"
   title:
-    fontFamily: '"DM Sans", sans-serif'
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' 
     fontSize: "17px"
     fontWeight: 650
   body:
-    fontFamily: '"DM Sans", sans-serif'
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' 
     fontSize: "14px"
     lineHeight: 1.6
   label:
-    fontFamily: '"DM Sans", sans-serif'
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' 
     fontSize: "12px"
     fontWeight: 550
   identifier:
@@ -92,7 +92,7 @@ The palette combines warm daylight neutrals with a deep green action color. Prim
 
 ## Typography
 
-DM Sans is the interface family, with a generic sans-serif fallback. Monospace is reserved for run identifiers, logical ticks, transaction signatures, and raw RPC results. Headline and title roles follow the frontmatter. Run titles use 20px at weight 600; timeline text uses 11px, with descriptions limited to 65ch. Compact captions range from 9px to 12px.
+The portfolio’s system sans stack is the interface family. Monospace is reserved for run identifiers, logical ticks, transaction signatures, and raw RPC results. Headline and title roles follow the frontmatter. Run titles use 20px at weight 600; timeline text uses 11px, with descriptions limited to 65ch. Compact captions range from 9px to 12px.
 
 ## Layout
 
@@ -140,3 +140,15 @@ encode success, timing, faults, or musical feedback. Prefer flat workspaces,
 compact empty states, direct labels, and visible controls over decorative welcome
 cards and repeated introductory slogans. This direction supersedes the green
 chrome guidance above; domain-specific status colors remain unchanged.
+
+## Shared portfolio typography
+
+The portfolio is the type reference. Interface and reading text use
+`-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif` with no downloaded
+display or body fonts. Use 400 for body text, 600 for controls and labels, 700
+for section headings, and 750 for page titles and wordmarks. Titles use tight
+tracking around -0.035em; prose remains at 1.65 line height and 45–75ch measure.
+App controls retain their denser role sizes; mobile text inputs remain 16px.
+Monospace is reserved for code, identifiers, expressions, and measured data.
+Music engraving and mathematical notation retain their domain fonts.
+This supersedes the earlier Manrope/DM Sans family guidance.
