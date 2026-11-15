@@ -128,3 +128,15 @@ Buttons transition background over 150ms with the CSS default easing. Reduced-mo
 - Do keep setup before recovery in mobile reading order.
 - Don't use shadows to add hierarchy to the existing flat surfaces.
 - Don't let the pipeline replace the event timeline as recovery evidence.
+
+
+## Portfolio alignment, November 2026
+
+The current portfolio is the visual reference: charcoal #212529, raised surface
+#292f35, heading #f1f3f5, body #ced4da, muted text #aeb8c1, border #495057,
+and blue #74c0fc. Light mode uses cool neutral surfaces and blue #1864ab.
+Blue identifies navigation and actions. Preserve green, amber, and red where they
+encode success, timing, faults, or musical feedback. Prefer flat workspaces,
+compact empty states, direct labels, and visible controls over decorative welcome
+cards and repeated introductory slogans. This direction supersedes the green
+chrome guidance above; domain-specific status colors remain unchanged.

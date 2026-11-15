@@ -164,9 +164,9 @@ function App() {
           <>
             <section className="intro">
               <div>
-                <h1>What survives a failure?</h1>
+                <h1>Payment failure lab</h1>
                 <p>
-                  Inject a fault. Replay the payment. Follow every state change.
+                  Simulate a duplicate, outage, or crash, then inspect the recovery.
                 </p>
               </div>
               <span className="simulation">
@@ -407,8 +407,7 @@ function App() {
                   </>
                 ) : (
                   <div className="empty">
-                    <FlaskConical size={40} />
-                    <h3>A failure worth inspecting</h3>
+                    <h3>No experiment running</h3>
                     <p>
                       Create an experiment, then advance one worker attempt at a
                       time. The timeline will show what committed and what
@@ -576,3 +575,4 @@ function App() {
   );
 }
 createRoot(document.getElementById("root")!).render(<App />);
+
