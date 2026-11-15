@@ -770,3 +770,5 @@ h2,h3 { font-weight: 700; }
 @media(max-width:800px) { .intro p { max-width: 60ch; } .pipeline { flex-wrap: wrap; gap: 8px; font-size: 11px; } }
 
 .timeline strong { text-transform: none; }
+
+.run-fact { display: inline-block; margin-right: 14px; }

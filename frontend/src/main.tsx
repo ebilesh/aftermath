@@ -148,7 +148,7 @@ function App() {
             <br />
             Repeated confirmations.
           </p>
-          <small>Python · SQLite · React</small>
+          <small>Python, SQLite and React</small>
         </div>
         <a className="author" href="https://github.com/ebilesh">
           github.com/ebilesh <ArrowRight size={14} />
@@ -442,8 +442,9 @@ function App() {
                   >
                     <code>{r.id}</code>
                     <span>
-                      {r.config.duplicates} extra confirmations · {r.config.outage_steps}{" "}
-                      failed checks · {r.config.crash === "after_commit" ? "crash after saving" : r.config.crash === "before_commit" ? "crash before saving" : "no crash"}
+                      <span className="run-fact">{r.config.duplicates} extra confirmations</span>
+                      <span className="run-fact">{r.config.outage_steps} failed checks</span>
+                      <span className="run-fact">{r.config.crash === "after_commit" ? "crash after saving" : r.config.crash === "before_commit" ? "crash before saving" : "no crash"}</span>
                     </span>
                     <span>
                       {r.complete
@@ -523,14 +524,14 @@ function App() {
                 </button>
               </form>
               <p className="footnote">
-                Commitment: finalized · Transaction versions: legacy and v0.
+                Commitment: finalized. Transaction versions: legacy and v0.
                 Public RPC may rate-limit requests. A missing result does not
                 prove a transaction failed.
               </p>
               {inspection && (
                 <div className="rpc-result">
                   <p>
-                    Network: {inspection.cluster} · Commitment:{" "}
+                    Network: {inspection.cluster}. Commitment:{" "}
                     {inspection.commitment}
                   </p>
                   <p className="signature">Signature: {inspection.signature}</p>
@@ -542,8 +543,8 @@ function App() {
                   {inspection.result && (
                     <>
                       <p>
-                        Slot {inspection.result.slot} · Fee{" "}
-                        {inspection.result.meta?.fee ?? "unknown"} lamports ·{" "}
+                        Slot {inspection.result.slot}. Fee:{" "}
+                        {inspection.result.meta?.fee ?? "unknown"} lamports. {" "}
                         {inspection.result.meta
                           ? !("err" in inspection.result.meta) ? "Execution metadata unavailable" : inspection.result.meta.err
                             ? "Execution failed"
@@ -556,7 +557,7 @@ function App() {
                         <div className="transfer-evidence">
                           {inspection.evidence.transfers.map((transfer: {scope:string;instruction:number;source:string;destination:string;lamports:string;applied:boolean}) => (
                             <article key={`${transfer.scope}:${transfer.instruction}`}>
-                              <strong>{transfer.lamports} lamports · {transfer.applied ? "Execution succeeded" : "Not confirmed as applied"}</strong>
+                              <strong>{transfer.lamports} lamports. {transfer.applied ? "Execution succeeded" : "Not confirmed as applied"}</strong>
                               <p className="signature">From: {transfer.source}</p>
                               <p className="signature">To: {transfer.destination}</p>
                               <small>{transfer.scope} / instruction {transfer.instruction}</small>
@@ -576,7 +577,7 @@ function App() {
           </>
         )}
         <footer>
-          <span>Aftermath · Payment recovery simulations</span>
+          <span>Aftermath payment recovery simulations</span>
           <span>One payment should leave one saved record.</span>
         </footer>
       </main>
