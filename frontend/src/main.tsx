@@ -266,7 +266,7 @@ function App() {
                     }
                   >
                     <option value="after_commit">
-                      After saving the payment, before marking it processed
+                      After saving, before marking done
                     </option>
                     <option value="before_commit">Before saving the payment</option>
                     <option value="none">No crash</option>

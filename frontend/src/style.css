@@ -768,3 +768,5 @@ h2,h3 { font-weight: 700; }
 .timeline summary { cursor: pointer; color: var(--muted); font-size: 12px; }
 .proof p { max-width: 65ch; }
 @media(max-width:800px) { .intro p { max-width: 60ch; } .pipeline { flex-wrap: wrap; gap: 8px; font-size: 11px; } }
+
+.timeline strong { text-transform: none; }
