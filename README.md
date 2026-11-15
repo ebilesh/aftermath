@@ -1,6 +1,10 @@
 # Aftermath
 
-A Solana payment failure lab. Reproduce an acknowledgement gap, recover the worker, and inspect why an order receives one credit despite repeated delivery.
+Test whether payment software can recover from a crash without recording the same payment twice.
+
+A customer pays once, but several copies of the payment confirmation arrive. Aftermath lets you stop the payment-processing program, restart it, and check that only one payment record is saved. The payments are simulated; no real money moves.
+
+The program that processes a confirmation is called a worker. Its payment records are stored in a ledger. Marking a confirmation as processed is an acknowledgement. The technical sections below use these terms.
 
 ## Run locally
 
@@ -21,21 +25,21 @@ python3 -m unittest backend.test_subprocess -v
 python3 experiments/replay.py experiments/ack-gap.json
 ```
 
-## Try the failure
+## Try the default simulation
 
-1. Create “The acknowledgement gap”. This queues four simulated notifications for one finalized 0.025 SOL transfer.
-2. Advance once. The simulated RPC is unavailable; no credit is written.
-3. Advance again. The credit commits, then the worker stops before acknowledging the notification.
-4. Restart the worker. Advance until every notification is acknowledged.
-5. Inspect `duplicate ignored` events and the single ledger credit. Export the full run as JSON. Create another run with the same recipe to reproduce the logical failure trace.
+1. Choose **Crash after saving the payment**, then **Create simulation**. This queues four confirmations for one simulated 0.025 SOL payment.
+2. Choose **Run next step**. The connection check fails, so the payment is not saved yet.
+3. Choose **Run next step** again. The program saves the payment, then crashes before marking the confirmation as processed.
+4. Choose **Restart the processor**, then keep choosing **Run next step** until the simulation finishes.
+5. Check that there is one payment record. The repeated confirmations should be skipped instead of creating more records. Download the event history as JSON to inspect each step.
 
-You can stop and restart the Python server at any point. `aftermath.sqlite3` persists runs, jobs, credits, and events. `AFTERMATH_DB` selects another path. There is no automatic worker: each Advance is one deterministic logical attempt, not elapsed wall time. Run IDs and job IDs differ between experiments; fault order and logical ticks reproduce.
+You can stop and restart the Python server at any point. `aftermath.sqlite3` persists runs, jobs, credits, and events. `AFTERMATH_DB` selects another path. There is no automatic worker: each Run next step is one deterministic logical attempt, not elapsed wall time. Run IDs and job IDs differ between experiments; fault order and logical ticks reproduce.
 
 ## Correctness model
 
 Notifications are at-least-once. Ledger effects are at-most-once per order and signature. Each run models one order and one synthetic finalized transfer. A SQLite primary key on order/run ID and unique signature constrain the ledger, independently of the UI. Integer lamports avoid rounding errors. `BEGIN IMMEDIATE` serializes each credit or acknowledgement transaction; concurrent attempts may reverify the same still-pending job, while constraints and conditional acknowledgement preserve safety; the ledger insert and its audit event commit atomically. Acknowledgement is deliberately a separate logical boundary. A crash after credit leaves the job pending; replay encounters the existing credit and acknowledges without crediting again.
 
-The UI launches a real Python worker subprocess for each Advance. The configured crash boundaries persist a stopped marker and exit that worker without acknowledgement; Restart clears the marker, and the next Advance launches a fresh process. A network outage causes the real worker to skip verification and retain pending work, using a deterministic counter rather than an actual severed socket. Payment inputs and chain verification are synthetic. The separate subprocess integration test kills an OS process at the committed-credit boundary. This does not emulate arbitrary crash timing, RPC consensus behavior, fork/reorg handling, or distributed leases. There is one local SQLite writer, no external side effect, and no claim of end-to-end exactly-once delivery.
+The UI launches a real Python worker subprocess for each Run next step. The configured crash boundaries persist a stopped marker and exit that worker without acknowledgement; Restart clears the marker, and the next Run next step launches a fresh process. A network outage causes the real worker to skip verification and retain pending work, using a deterministic counter rather than an actual severed socket. Payment inputs and chain verification are synthetic. The separate subprocess integration test kills an OS process at the committed-credit boundary. This does not emulate arbitrary crash timing, RPC consensus behavior, fork/reorg handling, or distributed leases. There is one local SQLite writer, no external side effect, and no claim of end-to-end exactly-once delivery.
 
 Tests cover persistence across a fresh Lab instance, before/after commit crashes, outage preservation, 31 concurrent worker attempts, direct database constraint violations, input bounds, and a recipe matrix. They assert both safety (no double credit) and liveness after recovery (every job acknowledged).
 

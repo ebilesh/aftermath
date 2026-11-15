@@ -152,3 +152,12 @@ App controls retain their denser role sizes; mobile text inputs remain 16px.
 Monospace is reserved for code, identifiers, expressions, and measured data.
 Music engraving and mathematical notation retain their domain fonts.
 This supersedes the earlier Manrope/DM Sans family guidance.
+
+
+## Explaining the simulation
+
+Introduce one payment and repeated confirmations before describing workers or
+the ledger. Explain that no real money moves. Keep technical event details in
+native disclosures and retain them in JSON exports. Show zero saved payments as
+a pending state, one as the intended result, and duplicate records as a failure.
+Use Create simulation, Run next step, and Restart the processor consistently.

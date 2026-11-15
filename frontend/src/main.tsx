@@ -28,18 +28,18 @@ type Run = {
 };
 const presets = [
   {
-    name: "The acknowledgement gap",
-    description: "Commit a credit. Crash before acknowledgement. Replay it.",
+    name: "Crash after saving the payment",
+    description: "Save the payment, stop before marking its confirmation as processed, then retry.",
     config: { duplicates: 3, outage_steps: 1, crash: "after_commit" },
   },
   {
     name: "Offline, then back",
-    description: "Hold notifications through three failed RPC attempts.",
+    description: "Keep the confirmations pending while three connection attempts fail.",
     config: { duplicates: 2, outage_steps: 3, crash: "none" },
   },
   {
-    name: "Crash before commit",
-    description: "Stop before any credit is written. Recover from disk.",
+    name: "Crash before saving the payment",
+    description: "Stop before saving the payment, then restart and try again.",
     config: { duplicates: 1, outage_steps: 0, crash: "before_commit" },
   },
 ];
@@ -58,6 +58,16 @@ async function api(path: string, body?: unknown) {
   if (!response.ok) throw new Error(result.error);
   return result;
 }
+const eventLabels: Record<string, string> = {
+  created: "Payment confirmations queued",
+  rpc_unavailable: "Connection unavailable; payment check will be retried",
+  verified: "Payment checked",
+  worker_crashed: "Payment processor stopped",
+  credited: "Payment record saved",
+  duplicate_ignored: "Payment already recorded; extra confirmation skipped",
+  acknowledged: "Confirmation marked as processed",
+  restarted: "Payment processor restarted",
+};
 function App() {
   const [view, setView] = useState("lab"),
     [runs, setRuns] = useState<Run[]>([]),
@@ -120,7 +130,7 @@ function App() {
             onClick={() => setView("lab")}
           >
             <FlaskConical size={18} />
-            Failure lab<span>01</span>
+            Payment simulation
           </button>
           <button
             className={view === "inspector" ? "active" : ""}
@@ -134,9 +144,9 @@ function App() {
         <div className="sidebar-note">
           <Terminal size={19} />
           <p>
-            Break the delivery.
+            One payment.
             <br />
-            Inspect the recovery.
+            Repeated confirmations.
           </p>
           <small>Python · SQLite · React</small>
         </div>
@@ -148,7 +158,7 @@ function App() {
         <header>
           <span>
             Workspace <ChevronRight size={14} />{" "}
-            {view === "lab" ? "Failure lab" : "Transaction inspector"}
+            {view === "lab" ? "Payment simulation" : "Transaction inspector"}
           </span>
           <span className="local">
             <i />
@@ -164,23 +174,28 @@ function App() {
           <>
             <section className="intro">
               <div>
-                <h1>Payment failure lab</h1>
+                <h1>Test a payment system crash</h1>
                 <p>
-                  Simulate a duplicate, outage, or crash, then inspect the recovery.
+                  A payment confirmation can arrive more than once. Simulate a crash and check that restarting the software records the payment only once.
                 </p>
               </div>
               <span className="simulation">
-                <i /> SIMULATED ACTIVITY
+                <i /> No real money moves
               </span>
+            </section>
+            <section className="start-guide" aria-labelledby="example-heading">
+              <h2 id="example-heading">The default example</h2>
+              <p>A customer pays once, but four copies of the payment confirmation arrive. The program crashes after saving the payment. Restart it and check whether the repeated confirmations create an extra payment record.</p>
+              <p>The payment-processing program is called a <strong>worker</strong>. Its payment records are stored in a <strong>ledger</strong>. The simulation uses Python workers and a SQLite database.</p>
             </section>
             <div className="workspace">
               <section className="controls">
                 <div className="section-title">
-                  <h2>Experiment setup</h2>
+                  <h2>Set up a simulation</h2>
                   <FlaskConical size={18} />
                 </div>
                 <p className="muted">
-                  One order. One transfer. Unreliable delivery.
+                  Send repeated confirmations for one payment and choose when the program stops.
                 </p>
                 <label>
                   Start with a scenario
@@ -195,7 +210,7 @@ function App() {
                     }}
                   >
                     <option value={-1} disabled>
-                      Custom experiment
+                      Custom simulation
                     </option>
                     {presets.map((p, i) => (
                       <option value={i} key={p.name}>
@@ -206,8 +221,8 @@ function App() {
                 </label>
                 <div className="field">
                   <div>
-                    <label htmlFor="duplicates">Duplicate notifications</label>
-                    <p>Extra deliveries of the same payment.</p>
+                    <label htmlFor="duplicates">Extra payment confirmations</label>
+                    <p>Copies of the same confirmation, not additional payments.</p>
                   </div>
                   <input
                     id="duplicates"
@@ -226,7 +241,7 @@ function App() {
                 <div className="field">
                   <div>
                     <label htmlFor="outage">Network outage</label>
-                    <p>Number of RPC attempts that fail.</p>
+                    <p>How many attempts to check the payment fail before the connection returns.</p>
                   </div>
                   <input
                     id="outage"
@@ -243,7 +258,7 @@ function App() {
                   />
                 </div>
                 <label>
-                  Worker crash point
+                  When the payment processor crashes
                   <select
                     value={config.crash}
                     onChange={(e) =>
@@ -251,17 +266,17 @@ function App() {
                     }
                   >
                     <option value="after_commit">
-                      After credit, before acknowledgement
+                      After saving the payment, before marking it processed
                     </option>
-                    <option value="before_commit">Before credit commits</option>
+                    <option value="before_commit">Before saving the payment</option>
                     <option value="none">No crash</option>
                   </select>
                 </label>
                 <div className="transfer">
-                  <span>SYNTHETIC TRANSFER</span>
+                  <span>Simulated payment</span>
                   <strong>0.025 SOL</strong>
                   <small>
-                    Finalized · matching recipient · integer lamports
+                    SOL is the currency used on the Solana network.
                   </small>
                 </div>
                 <button
@@ -270,25 +285,24 @@ function App() {
                   onClick={() => action(() => update("/runs", config))}
                 >
                   <Play size={16} />
-                  Create experiment
+                  Create simulation
                   <ArrowRight size={16} />
                 </button>
                 <p className="footnote">
-                  Synthetic payment inputs. Real Python worker processes and
-                  SQLite commits. One attempt per logical tick.
+                  No funds are sent. Each step runs the payment-processing program once; the saved records stay in a local database.
                 </p>
               </section>
               <section className="run-panel">
                 <div className="section-title">
-                  <h2>Recovery workbench</h2>
+                  <h2>Watch what happens</h2>
                   <span className={"status " + (run?.crashed ? "stopped" : "")}>
                     {run
                       ? run.crashed
-                        ? "Worker stopped"
+                        ? "Program stopped"
                         : run.complete
                           ? "Complete"
-                          : "Ready to advance"
-                      : "Awaiting experiment"}
+                          : "Ready for the next step"
+                      : "Create a simulation to begin"}
                   </span>
                 </div>
                 {run ? (
@@ -301,24 +315,24 @@ function App() {
                             (p) =>
                               JSON.stringify(p.config) ===
                               JSON.stringify(run.config),
-                          )?.name || "Custom experiment"}
+                          )?.name || "Custom simulation"}
                         </h3>
                       </div>
                       <button
                         className="icon-button"
                         onClick={exportRun}
-                        title="Export run JSON"
-                        aria-label="Export run JSON"
+                        title="Download event history (JSON)"
+                        aria-label="Download event history (JSON)"
                       >
                         <Download size={18} />
                       </button>
                     </div>
                     <div className="pipeline">
                       {[
-                        "Notification",
-                        "Verify transfer",
-                        "Credit ledger",
-                        "Acknowledge",
+                        "Receive confirmation",
+                        "Check payment",
+                        "Save payment",
+                        "Mark processed",
                       ].map((x, i) => (
                         <React.Fragment key={x}>
                           <span
@@ -338,24 +352,24 @@ function App() {
                       <ShieldCheck size={27} />
                       <div>
                         <strong>
-                          {run.credits.length} / 1 credits written
+                          {run.credits.length} payment record{run.credits.length === 1 ? "" : "s"} saved
                         </strong>
                         <p>
                           {run.invariant
-                            ? "Single-credit invariant holds."
-                            : "Invariant violated."}{" "}
+                            ? run.credits.length === 0 ? "No payment has been saved yet." : "The same payment has not been recorded twice."
+                            : "The payment was recorded more than once."}{" "}
                           {run.jobs.filter((j) => j.state === "acked").length}{" "}
-                          of {run.jobs.length} notifications acknowledged.
+                          of {run.jobs.length} confirmations marked as processed. Expected final total: one payment record.
                         </p>
                       </div>
                       <Check size={20} />
                     </div>
                     <div className="timeline-head">
                       <h3>
-                        Event timeline <span>{run.events.length}</span>
+                        What happened <span>{run.events.length}</span>
                       </h3>
                       <div>
-                        <span>tick {String(run.tick).padStart(2, "0")}</span>
+                        <span>step {String(run.tick).padStart(2, "0")}</span>
                         <button
                           disabled={busy || run.complete}
                           onClick={() =>
@@ -371,7 +385,7 @@ function App() {
                           ) : (
                             <Play size={14} />
                           )}{" "}
-                          {run.crashed ? "Restart worker" : "Advance worker"}
+                          {run.crashed ? "Restart the processor" : "Run next step"}
                         </button>
                       </div>
                     </div>
@@ -392,26 +406,23 @@ function App() {
                           </span>
                           <div className="event-dot" />
                           <div>
-                            <strong>{e.kind.replaceAll("_", " ")}</strong>
-                            <p>{e.detail}</p>
+                            <strong>{eventLabels[e.kind] || e.kind.replaceAll("_", " ")}</strong>
+                            <details><summary>Technical details</summary><p>{e.detail}</p></details>
                           </div>
                         </li>
                       ))}
                     </ol>
                     {run.complete && (
                       <div className="complete">
-                        <Check size={17} /> All notifications acknowledged.
-                        Replay recovered with one credit.
+                        <Check size={17} /> All confirmations processed. {run.credits.length === 1 ? "The payment was recorded once." : "Check the payment count above."}
                       </div>
                     )}
                   </>
                 ) : (
                   <div className="empty">
-                    <h3>No experiment running</h3>
+                    <h3>Start with the crash example</h3>
                     <p>
-                      Create an experiment, then advance one worker attempt at a
-                      time. The timeline will show what committed and what
-                      recovery repeats.
+                      Choose Create simulation, then Run next step until the program stops. Restart the processor and keep stepping until it finishes. Check that only one payment record was saved.
                     </p>
                   </div>
                 )}
@@ -419,7 +430,7 @@ function App() {
             </div>
             <section className="history">
               <div className="section-title">
-                <h2>Recent experiments</h2>
+                <h2>Saved simulations</h2>
                 <span>{runs.length} saved locally</span>
               </div>
               {runs.length ? (
@@ -431,8 +442,8 @@ function App() {
                   >
                     <code>{r.id}</code>
                     <span>
-                      {r.config.duplicates} duplicates · {r.config.outage_steps}{" "}
-                      outage steps · {r.config.crash.replaceAll("_", " ")}
+                      {r.config.duplicates} extra confirmations · {r.config.outage_steps}{" "}
+                      failed checks · {r.config.crash === "after_commit" ? "crash after saving" : r.config.crash === "before_commit" ? "crash before saving" : "no crash"}
                     </span>
                     <span>
                       {r.complete
@@ -446,8 +457,7 @@ function App() {
                 ))
               ) : (
                 <p className="muted">
-                  Your experiments will appear here. Each run keeps its
-                  configuration and audit trail.
+                  Your simulations will appear here with their settings and event history.
                 </p>
               )}
             </section>
@@ -456,7 +466,7 @@ function App() {
           <>
             <section className="intro">
               <div>
-                <h1>Inspect the chain.</h1>
+                <h1>Look up a Solana transaction</h1>
                 <p>
                   Read a real finalized Solana transaction without connecting a
                   wallet.
@@ -467,8 +477,7 @@ function App() {
             <section className="inspector">
               <h2>Transaction lookup</h2>
               <p>
-                Queries the public Solana RPC. Results never enter the simulated
-                credit ledger.
+                Look up a payment by its transaction ID. This reads public network data and does not send money or change the simulation.
               </p>
               <form
                 onSubmit={(e) => {
@@ -482,7 +491,7 @@ function App() {
                 }}
               >
                 <label>
-                  Cluster
+                  Network
                   <select
                     disabled={busy}
                     value={cluster}
@@ -496,7 +505,7 @@ function App() {
                   </select>
                 </label>
                 <label>
-                  Transaction signature
+                  Transaction ID (signature)
                   <input
                     disabled={busy}
                     required
@@ -505,7 +514,7 @@ function App() {
                       setSignature(e.target.value);
                       setInspection(null);
                     }}
-                    placeholder="Paste a base58 transaction signature"
+                    placeholder="Paste a Solana transaction ID"
                   />
                 </label>
                 <button className="primary" disabled={busy}>
@@ -567,8 +576,8 @@ function App() {
           </>
         )}
         <footer>
-          <span>Aftermath · Reproducible failure testing</span>
-          <span>At-least-once delivery. At-most-one credit.</span>
+          <span>Aftermath · Payment recovery simulations</span>
+          <span>One payment should leave one saved record.</span>
         </footer>
       </main>
     </div>
